@@ -18,8 +18,8 @@ public class Main {
         List<FunctionInfo> list = getAllFunctions(Integer.parseInt(new Scanner(System.in).nextLine()));
         plotResult(getBMatrix(list).solve(getLMatrix(list)), list, 2000);
     }
-
-    private static double integrate(double a, double b, Function function) {
+    
+    private static double gaussianQuadrature(double a, double b, Function function) {
         return (b - a) / 2 *
                 (function.functionResult((b - a) / 2 / Math.sqrt(3) + (a + b) / 2) +
                         function.functionResult((b - a) / 2 / -Math.sqrt(3) + (a + b) / 2));
@@ -46,8 +46,8 @@ public class Main {
         int k = 0;
         while (i < 2.0) {
             int j = k;
-            temp[j][0] = integrate(i, i + 2.0 / functions.size(), (double x) -> functions.get(j).getFunctionResults(x) * Math.sin(x)) +
-                    integrate(i + 2.0 / functions.size(), i + (double) 4 / functions.size(), (double x) -> functions.get(j).getFunctionResults(x) * Math.sin(x));
+            temp[j][0] = gaussianQuadrature(i, i + 2.0 / functions.size(), (double x) -> functions.get(j).getFunctionResults(x) * Math.sin(x)) +
+                    gaussianQuadrature(i + 2.0 / functions.size(), i + (double) 4 / functions.size(), (double x) -> functions.get(j).getFunctionResults(x) * Math.sin(x));
             i += 2.0 / functions.size();
             k++;
         }
@@ -69,31 +69,31 @@ public class Main {
         if (a >= b)
             return res;
         if (functionInfo.equals(functionInfo1)) {
-            res -= integrate(a, (b + a) / 2.0,
+            res -= gaussianQuadrature(a, (b + a) / 2.0,
                     (double x) -> functionInfo.getLeftFunction().functionResult(x) *
                             functionInfo1.getLeftFunction().functionResult(x));
-            res -= integrate((b + a) / 2.0, b,
+            res -= gaussianQuadrature((b + a) / 2.0, b,
                     (double x) -> functionInfo.getRightFunction().functionResult(x) *
                             functionInfo1.getRightFunction().functionResult(x));
-            res += integrate(a, (b + a) / 2.0,
+            res += gaussianQuadrature(a, (b + a) / 2.0,
                     (double x) -> derivativeApproximation(functionInfo.getLeftFunction()).functionResult(x) *
                             derivativeApproximation(functionInfo1.getLeftFunction()).functionResult(x));
-            res += integrate((b + a) / 2.0, b,
+            res += gaussianQuadrature((b + a) / 2.0, b,
                     (double x) -> derivativeApproximation(functionInfo.getRightFunction()).functionResult(x) *
                             derivativeApproximation(functionInfo1.getRightFunction()).functionResult(x));
         } else {
             if (functionInfo.getRightBound() > functionInfo1.getRightBound()) {
-                res -= integrate(a, b,
+                res -= gaussianQuadrature(a, b,
                         (double x) -> functionInfo.getLeftFunction().functionResult(x) *
                                 functionInfo1.getRightFunction().functionResult(x));
-                res += integrate(a, b,
+                res += gaussianQuadrature(a, b,
                         (double x) -> derivativeApproximation(functionInfo.getLeftFunction()).functionResult(x) *
                                 derivativeApproximation(functionInfo1.getRightFunction()).functionResult(x));
             } else {
-                res -= integrate(a, b,
+                res -= gaussianQuadrature(a, b,
                         (double x) -> functionInfo.getRightFunction().functionResult(x) *
                                 functionInfo1.getLeftFunction().functionResult(x));
-                res += integrate(a, b,
+                res += gaussianQuadrature(a, b,
                         (double x) -> derivativeApproximation(functionInfo.getRightFunction()).functionResult(x) *
                                 derivativeApproximation(functionInfo1.getLeftFunction()).functionResult(x));
             }
