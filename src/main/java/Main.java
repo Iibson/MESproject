@@ -1,22 +1,24 @@
 import Jama.Matrix;
 import edu.princeton.cs.introcs.StdDraw;
-
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.Scanner;
+
+/**
+ *  Author: Jakub Libera
+ *  Program Takes N from console
+ */
 
 public class Main {
 
     public static void main(String[] args) {
-//        List<FunctionInfo> list = getAllFunctions(Integer.parseInt(args[0]));
-        List<FunctionInfo> list = getAllFunctions(3);
-        Matrix lMatrix = getLMatrix(list);
-        Matrix res = getBMatrix(list).solve(lMatrix);
+        List<FunctionInfo> list = getAllFunctions(Integer.parseInt(new Scanner(System.in).nextLine()));
+        Matrix res = getBMatrix(list).solve(getLMatrix(list));
         double[][] res1 = res.getArray();
         for (double[] doubles : res1)
             for (double aDouble : doubles)
                 System.out.print(" " + aDouble);
-        plotResult();
+        plotResult(getBMatrix(list).solve(getLMatrix(list)), 2000);
     }
 
     private static double integrate(double a, double b, Function function) {
@@ -56,11 +58,11 @@ public class Main {
 
     private static Matrix getBMatrix(List<FunctionInfo> functions) {
         double[][] temp = new double[functions.size()][functions.size()];
-        for (int i = 0; i < functions.size(); i++) {
-            for (int j = 0; j < functions.size(); j++) {
+        for (int i = 0; i < functions.size(); i++)
+            for (int j = 0; j < functions.size(); j++)
                 temp[i][j] = getBFunction(functions.get(i), functions.get(j));
-            }
-        }
+//        for (int i = 0; i < functions.size(); i++)
+//            System.out.println(temp[i][0] + " " + temp[i][1] + " " + temp[i][2]);
         return new Matrix(temp);
     }
 
@@ -107,9 +109,8 @@ public class Main {
         return (double x) -> (function.functionResult(x + 0.001) - function.functionResult(x - 0.001)) / 0.001 / 2;
     }
 
-    private static void plotResult() {
+    private static void plotResult(Matrix matrix, int n) {
         // number of line segments to plot
-        int n = 500;
 
         // the function y = sin(4x) + sin(20x), sampled at n+1 points
         // between x = 0 and x = pi
