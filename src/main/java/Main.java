@@ -1,24 +1,22 @@
 import Jama.Matrix;
 import edu.princeton.cs.introcs.StdDraw;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
 /**
- *  Author: Jakub Libera
- *  Program Takes N from console
+ * Author: Jakub Libera
+ * Program Takes N from console
+ * -u''(x) - u(x) = sin(x)
+ * x e [0, 2]
  */
 
 public class Main {
 
     public static void main(String[] args) {
         List<FunctionInfo> list = getAllFunctions(Integer.parseInt(new Scanner(System.in).nextLine()));
-        Matrix res = getBMatrix(list).solve(getLMatrix(list));
-        double[][] res1 = res.getArray();
-        for (double[] doubles : res1)
-            for (double aDouble : doubles)
-                System.out.print(" " + aDouble);
-        plotResult(getBMatrix(list).solve(getLMatrix(list)), 2000);
+        plotResult(getBMatrix(list).solve(getLMatrix(list)), list, 2000);
     }
 
     private static double integrate(double a, double b, Function function) {
@@ -61,8 +59,6 @@ public class Main {
         for (int i = 0; i < functions.size(); i++)
             for (int j = 0; j < functions.size(); j++)
                 temp[i][j] = getBFunction(functions.get(i), functions.get(j));
-//        for (int i = 0; i < functions.size(); i++)
-//            System.out.println(temp[i][0] + " " + temp[i][1] + " " + temp[i][2]);
         return new Matrix(temp);
     }
 
@@ -109,25 +105,24 @@ public class Main {
         return (double x) -> (function.functionResult(x + 0.001) - function.functionResult(x - 0.001)) / 0.001 / 2;
     }
 
-    private static void plotResult(Matrix matrix, int n) {
-        // number of line segments to plot
-
-        // the function y = sin(4x) + sin(20x), sampled at n+1 points
-        // between x = 0 and x = pi
+    private static void plotResult(Matrix matrix, List<FunctionInfo> list, int n) {
         double[] x = new double[n + 1];
         double[] y = new double[n + 1];
         for (int i = 0; i <= n; i++) {
-            x[i] = Math.PI * i / n;
-            y[i] = Math.sin(4 * x[i]) + Math.sin(20 * x[i]);
+            x[i] = 2.0 * (double) i / (double) n;
+            y[i] = getYFromFunctions(matrix.getArray(), list, x[i]);
         }
-
-        // rescale the coordinate system
         StdDraw.setXscale(0, 2);
         StdDraw.setYscale(-2.0, +2.0);
+        for (int i = 0; i < n; i++)
+            StdDraw.point(x[i], y[i]);
+    }
 
-        // plot the approximation to the function
-        for (int i = 0; i < n; i++) {
-            StdDraw.line(x[i], y[i], x[i + 1], y[i + 1]);
-        }
+    private static double getYFromFunctions(double[][] matrix, List<FunctionInfo> list, double x) {
+        double res = 0;
+        for (int i = 0; i < list.size(); i++)
+            if (list.get(i).getLeftBound() <= x && list.get(i).getRightBound() >= x)
+                res += list.get(i).getFunctionResults(x) * matrix[i][0];
+        return res;
     }
 }
