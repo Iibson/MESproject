@@ -9,6 +9,8 @@ import java.util.Scanner;
  * Author: Jakub Libera
  * Program Takes N from console
  * -u''(x) - u(x) = sin(x)
+ * u(0) = 0
+ * u'(2) = u(2)
  * x e [0, 2]
  */
 
@@ -116,6 +118,11 @@ public class Main {
         StdDraw.setYscale(-2.0, +2.0);
         for (int i = 0; i < n; i++)
             StdDraw.point(x[i], y[i]);
+        /*
+          SPODZIEWANY WYNIK
+         */
+//        for (int i = 0; i < n; i++)
+//            StdDraw.point(x[i], (x[i] * Math.cos(x[i]) -  1.0581 * Math.sin(x[i])) / 2);
     }
 
     private static double getYFromFunctions(double[][] matrix, List<FunctionInfo> list, double x) {
