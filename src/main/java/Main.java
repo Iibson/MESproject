@@ -1,9 +1,9 @@
 import Jama.Matrix;
 import edu.princeton.cs.introcs.StdDraw;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 
 /**
  * Author: Jakub Libera
@@ -14,11 +14,21 @@ import java.util.Scanner;
  * x e [0, 2]
  */
 
+/**
+ *
+ * Program uruchamiamy z 2 argumentami
+ *  1 - definiuje nasze N
+ *  2 - definiuje dokładność naszego wykresu tzn ilość punktów z których zbudujemy nasz wykres
+ * W przypadku nie podania argumentow program wystartuje z N = 1000
+ * więcej szegółow w funkcji main
+ *
+ */
+
 public class Main {
 
     public static void main(String[] args) {
-        List<FunctionInfo> list = getAllFunctions(Integer.parseInt(new Scanner(System.in).nextLine()));
-        plotResult(getBMatrix(list).solve(getLMatrix(list)), list, 2000);
+        List<FunctionInfo> list = getAllFunctions((args.length == 1) ? Integer.parseInt(args[0]) : 1000);
+        plotResult(getBMatrix(list).solve(getLMatrix(list)), list, ((args.length == 2) ? Integer.parseInt(args[1]) : 1000));
     }
     
     private static double gaussianQuadrature(double a, double b, Function function) {
@@ -108,21 +118,21 @@ public class Main {
     }
 
     private static void plotResult(Matrix matrix, List<FunctionInfo> list, int n) {
-        double[] x = new double[n + 1];
-        double[] y = new double[n + 1];
-        for (int i = 0; i <= n; i++) {
-            x[i] = 2.0 * (double) i / (double) n;
-            y[i] = getYFromFunctions(matrix.getArray(), list, x[i]);
-        }
         StdDraw.setXscale(0, 2);
         StdDraw.setYscale(-2.0, +2.0);
-        for (int i = 0; i < n; i++)
-            StdDraw.point(x[i], y[i]);
-        /*
+        StdDraw.line(0, 2, 0, -2);
+        StdDraw.line(0, 0, 2, 0);
+        StdDraw.setPenColor(Color.RED);
+        for (int i = 0; i <= n; i++)
+            StdDraw.point(2.0 * (double) i / (double) n,
+                    getYFromFunctions(matrix.getArray(), list, 2.0 * (double) i / (double) n));
+        /**
           SPODZIEWANY WYNIK
-         */
-//        for (int i = 0; i < n; i++)
-//            StdDraw.point(x[i], (x[i] * Math.cos(x[i]) -  1.0581 * Math.sin(x[i])) / 2);
+         **/
+        StdDraw.setPenColor(Color.GREEN);
+        for (int i = 0; i < n; i++)
+            StdDraw.point(2.0 * (double) i / (double) n,
+                    (2.0 * (double) i / (double) n * Math.cos(2.0 * (double) i / (double) n) -  1.0581 * Math.sin(2.0 * (double) i / (double) n)) / 2);
     }
 
     private static double getYFromFunctions(double[][] matrix, List<FunctionInfo> list, double x) {
@@ -133,3 +143,5 @@ public class Main {
         return res;
     }
 }
+
+
